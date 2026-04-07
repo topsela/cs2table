@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 const SKINS = [
@@ -34,19 +34,44 @@ function PriceCell({ val, best }) {
   return <span className="price">${val.toFixed(2)}</span>
 }
 
-function Check() {
-  return <span className="check">v</span>
-}
-
-function Cross() {
-  return <span className="cross">x</span>
-}
-
 export default function App() {
   const [search, setSearch] = useState('')
   const [wear, setWear] = useState('All')
   const [sortCol, setSortCol] = useState(null)
   const [sortDir, setSortDir] = useState(1)
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      fetch('https://cs2table-backend-production.up.railway.app/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(r => r.json())
+      .then(data => { if (data.steam_id) setUser(data) })
+      .catch(() => localStorage.removeItem('token'))
+    }
+    const params = new URLSearchParams(window.location.search)
+    const newToken = params.get('token')
+    if (newToken) {
+      localStorage.setItem('token', newToken)
+      window.history.replaceState({}, '', '/')
+      fetch('https://cs2table-backend-production.up.railway.app/auth/me', {
+        headers: { 'Authorization': `Bearer ${newToken}` }
+      })
+      .then(r => r.json())
+      .then(data => { if (data.steam_id) setUser(data) })
+    }
+  }, [])
+
+  function loginWithSteam() {
+    window.location.href = 'https://cs2table-backend-production.up.railway.app/auth/steam'
+  }
+
+  function logout() {
+    localStorage.removeItem('token')
+    setUser(null)
+  }
 
   const filtered = SKINS
     .filter(s => s.name.toLowerCase().includes(search.toLowerCase()))
@@ -75,8 +100,23 @@ export default function App() {
           <li>Pricing</li>
         </ul>
         <div className="nav-right">
-          <button className="btn-ghost">Log in</button>
-          <button className="btn-orange">Get started</button>
+          {user ? (
+            <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+              <img
+                src={user.avatar}
+                alt="avatar"
+                style={{width:'32px', height:'32px', borderRadius:'50%', border:'2px solid rgba(59,130,246,0.4)'}}
+              />
+              <span style={{fontSize:'13px', color:'rgba(255,255,255,0.8)', fontFamily:'Space Grotesk'}}>
+                {user.username}
+              </span>
+              <button className="btn-ghost" onClick={logout}>Log out</button>
+            </div>
+          ) : (
+            <button className="btn-orange" onClick={loginWithSteam}>
+              Login with Steam
+            </button>
+          )}
         </div>
       </nav>
 
@@ -176,12 +216,12 @@ export default function App() {
           <div className="plan-price">$0 <span>/mo</span></div>
           <div className="plan-desc">Perfect to get started</div>
           <ul className="plan-features">
-            <li><Check /> 5 marketplaces</li>
-            <li><Check /> 60 min updates</li>
-            <li><Check /> Basic search</li>
-            <li><Cross /> Price alerts</li>
-            <li><Cross /> Flip finder</li>
-            <li><Cross /> API access</li>
+            <li><span className="check">v</span> 5 marketplaces</li>
+            <li><span className="check">v</span> 60 min updates</li>
+            <li><span className="check">v</span> Basic search</li>
+            <li><span className="cross">x</span> Price alerts</li>
+            <li><span className="cross">x</span> Flip finder</li>
+            <li><span className="cross">x</span> API access</li>
           </ul>
           <button className="plan-btn plan-btn-free">Start free</button>
         </div>
@@ -192,12 +232,12 @@ export default function App() {
           <div className="plan-price">$12 <span>/mo</span></div>
           <div className="plan-desc">For active traders</div>
           <ul className="plan-features">
-            <li><Check /> 30+ marketplaces</li>
-            <li><Check /> 5 min updates</li>
-            <li><Check /> Price alerts</li>
-            <li><Check /> Flip finder</li>
-            <li><Check /> Portfolio tracker</li>
-            <li><Cross /> API access</li>
+            <li><span className="check">v</span> 30+ marketplaces</li>
+            <li><span className="check">v</span> 5 min updates</li>
+            <li><span className="check">v</span> Price alerts</li>
+            <li><span className="check">v</span> Flip finder</li>
+            <li><span className="check">v</span> Portfolio tracker</li>
+            <li><span className="cross">x</span> API access</li>
           </ul>
           <button className="plan-btn plan-btn-pro">Get Pro</button>
         </div>
@@ -207,12 +247,12 @@ export default function App() {
           <div className="plan-price">$29 <span>/mo</span></div>
           <div className="plan-desc">For power users and bots</div>
           <ul className="plan-features">
-            <li><Check /> Everything in Pro</li>
-            <li><Check /> REST API access</li>
-            <li><Check /> Telegram bot</li>
-            <li><Check /> Webhook alerts</li>
-            <li><Check /> 1 min updates</li>
-            <li><Check /> Priority support</li>
+            <li><span className="check">v</span> Everything in Pro</li>
+            <li><span className="check">v</span> REST API access</li>
+            <li><span className="check">v</span> Telegram bot</li>
+            <li><span className="check">v</span> Webhook alerts</li>
+            <li><span className="check">v</span> 1 min updates</li>
+            <li><span className="check">v</span> Priority support</li>
           </ul>
           <button className="plan-btn plan-btn-trader">Get Trader</button>
         </div>
