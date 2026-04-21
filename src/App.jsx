@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './App.css'
+
+const BACKEND = 'https://cs2table-backend-production.up.railway.app'
 
 const SKINS = [
   { name: "AK-47 | Redline", wear: "FT", rarity: "#e4ae39", icon: "gun", steam: 28.50, skinport: 21.30, csmoney: 22.80, dmarket: 21.10, buff: 19.40 },
@@ -40,11 +43,12 @@ export default function App() {
   const [sortCol, setSortCol] = useState(null)
   const [sortDir, setSortDir] = useState(1)
   const [user, setUser] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      fetch('https://cs2table-backend-production.up.railway.app/auth/me', {
+      fetch(`${BACKEND}/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(r => r.json())
@@ -56,7 +60,7 @@ export default function App() {
     if (newToken) {
       localStorage.setItem('token', newToken)
       window.history.replaceState({}, '', '/')
-      fetch('https://cs2table-backend-production.up.railway.app/auth/me', {
+      fetch(`${BACKEND}/auth/me`, {
         headers: { 'Authorization': `Bearer ${newToken}` }
       })
       .then(r => r.json())
@@ -65,7 +69,7 @@ export default function App() {
   }, [])
 
   function loginWithSteam() {
-    window.location.href = 'https://cs2table-backend-production.up.railway.app/auth/steam'
+    window.location.href = `${BACKEND}/auth/steam`
   }
 
   function logout() {
@@ -95,7 +99,7 @@ export default function App() {
         <div className="logo">cs2<span>table</span></div>
         <ul className="nav-links">
           <li>Prices</li>
-          <li>Flip finder</li>
+          <li onClick={() => navigate('/flips')}>Flip finder</li>
           <li>Alerts</li>
           <li>Pricing</li>
         </ul>
@@ -105,17 +109,14 @@ export default function App() {
               <img
                 src={user.avatar}
                 alt="avatar"
-                style={{width:'32px', height:'32px', borderRadius:'50%', border:'2px solid rgba(59,130,246,0.4)'}}
+                onClick={() => navigate('/profile')}
+                style={{width:'32px', height:'32px', borderRadius:'50%', border:'2px solid rgba(59,130,246,0.4)', cursor:'pointer'}}
               />
-              <span style={{fontSize:'13px', color:'rgba(255,255,255,0.8)', fontFamily:'Space Grotesk'}}>
-                {user.username}
-              </span>
+              <span style={{fontSize:'13px', color:'rgba(255,255,255,0.8)', fontFamily:'Space Grotesk'}}>{user.username}</span>
               <button className="btn-ghost" onClick={logout}>Log out</button>
             </div>
           ) : (
-            <button className="btn-orange" onClick={loginWithSteam}>
-              Login with Steam
-            </button>
+            <button className="btn-orange" onClick={loginWithSteam}>Login with Steam</button>
           )}
         </div>
       </nav>
@@ -138,7 +139,7 @@ export default function App() {
         <div className="tab">Rifles</div>
         <div className="tab">Pistols</div>
         <div className="tab">Gloves</div>
-        <div className="tab special">Flip finder</div>
+        <div className="tab special" onClick={() => navigate('/flips')}>Flip finder</div>
       </div>
 
       <div className="filters">
@@ -210,7 +211,6 @@ export default function App() {
       <div className="section-divider"><span>Choose your plan</span></div>
 
       <div className="pricing-grid">
-
         <div className="plan-card">
           <div className="plan-name">Free</div>
           <div className="plan-price">$0 <span>/mo</span></div>
@@ -256,7 +256,6 @@ export default function App() {
           </ul>
           <button className="plan-btn plan-btn-trader">Get Trader</button>
         </div>
-
       </div>
 
       <div className="footer-bar">
