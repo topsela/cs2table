@@ -5,12 +5,14 @@ import './index.css'
 import App from './App.jsx'
 import Profile from './Profile.jsx'
 import TopFlips from './TopFlips.jsx'
+import Prices from './Prices.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/prices" element={<Prices />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/flips" element={<TopFlips />} />
         <Route path="/auth/callback" element={<App />} />

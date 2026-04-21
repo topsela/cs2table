@@ -98,7 +98,7 @@ export default function App() {
       <nav className="nav">
         <div className="logo">cs2<span>table</span></div>
         <ul className="nav-links">
-          <li>Prices</li>
+          <li onClick={() => navigate('/prices')}>Prices</li>
           <li onClick={() => navigate('/flips')}>Flip finder</li>
           <li>Alerts</li>
           <li>Pricing</li>
